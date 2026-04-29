@@ -32,7 +32,21 @@ As a marathon runner and cyclist, I found that existing apps track workouts, nut
 - Real-world problem solving
 
 ## Screenshots
-(Add your UI screenshots here)
+
+### Dashboard
+![Dashboard](./screenshots/dashboard.png)
+
+### Analytics
+![Analytics](./screenshots/analytics.png)
+
+### Workout Logging
+![Workout](./screenshots/workout.png)
+
+### Nutrition Tracker
+![Nutrition](./screenshots/nutrition.png)
+
+### Race Planner
+![Race](./screenshots/race.png)
 
 ## How to Run
 npm install  
