@@ -1,36 +1,37 @@
 # AthletOS — Multi-Sport Performance Dashboard
 
-Live: https://athelete-os.vercel.app
+# Live: https://athelete-os.vercel.app
+---
+AthletOS is a web app I built to track my workouts, nutrition, and performance in one place.
+I run marathons and also do cycling and strength training. I was using different apps for each thing, and it was hard to understand overall training load and recovery. So I built this to solve that problem.
+---
+## What it does
+- Log workouts (running, cycling, strength, swimming)
+- Calculate training load based on effort (RPE) and volume
+- Show fitness vs fatigue trends in charts
+- Track daily nutrition (calories, macros, hydration)
+- Plan races with countdown and targets
+- Export weekly report (PDF & Excel)
+- Track personal records
+---
+## How it works (simple idea)
+Each workout is stored with distance/duration and RPE.
+Training load is calculated using a simple formula like:
+load = volume × (RPE / 5)
+This helps compare different workouts and understand how hard I’m training over time.
+The analytics page uses this data to show trends like fatigue and fitness.
 
-AthletOS is a full-featured web application built to track and analyze training, nutrition, and performance for endurance athletes.
-
-## Why I Built This
-As a marathon runner and cyclist, I found that existing apps track workouts, nutrition, and performance separately. I built AthletOS to combine everything into one system.
-
-## Features
-- Workout logging (running, cycling, strength, swimming)
-- Training load calculation based on RPE and volume
-- Analytics dashboard (fitness vs fatigue trends)
-- Nutrition tracking (calories, macros, hydration)
-- Race planner with countdown and targets
-- Weekly report export (PDF & Excel)
-- Personal records tracking
+---
 
 ## Tech Stack
-- React.js (Vite)
-- Redux Toolkit
+- React (Vite)
+- Redux Toolkit (state management)
 - Tailwind CSS
-- Recharts
-- Formik + Yup
-- jsPDF + ExcelJS
+- Recharts (charts)
+- Formik + Yup (forms)
+- jsPDF & ExcelJS (exports)
 - LocalStorage (data persistence)
-
-## Key Concepts Implemented
-- Centralized state management
-- Data visualization
-- Performance optimization (memoization, lazy loading)
-- Real-world problem solving
-
+---
 ## Screenshots
 
 ### Dashboard
