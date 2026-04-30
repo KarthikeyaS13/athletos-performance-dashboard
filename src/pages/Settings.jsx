@@ -4,6 +4,8 @@ import { Button } from '../components/UI/Button';
 import { Formik, Form, Field } from 'formik';
 import { updateTargets, updateProfile } from '../store/slices/settingsSlice';
 import { Download, Upload, Trash2, User, Target } from 'lucide-react';
+import jsPDF from 'jspdf'
+import autoTable from "jspdf-autotable";
 
 const Settings = () => {
    const settings = useSelector(state => state.settings);
@@ -13,16 +15,117 @@ const Settings = () => {
       "w-full bg-white dark:bg-[#111827] border-2 border-gray-300 dark:border-[#243244] rounded-xl px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/50 hover:border-gray-400 dark:hover:border-[#2d3a4f] transition-colors shadow-sm";
 
    const handleExportData = () => {
-      const data = localStorage.getItem('athletos_data');
-      const blob = new Blob([data], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `athletos_backup_${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      const { profile, targets } = settings;
+
+      const doc = new jsPDF();
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(20);
+      doc.text("Athlete Report", 14, 20);
+
+      doc.setFontSize(10);
+      doc.setTextColor(120);
+      doc.text("Generated from AthleteOS", 14, 26);
+
+      autoTable(doc, {
+         startY: 35,
+         head: [["Profile Details", ""]],
+         body: [
+            ["Name", profile.name || "-"],
+            ["Age", profile.age || "-"],
+            ["Weight", `${profile.weight || "-"} kg`],
+            ["Max HR", profile.maxHR || "-"],
+         ],
+         columnStyles: {
+            0: { cellWidth: 80, fontStyle: 'bold' },
+            1: { cellWidth: 100 },
+         },
+         theme: "grid",
+         styles: {
+            fontSize: 11,
+            cellPadding: 4,
+         },
+         headStyles: {
+            fillColor: [59, 130, 246],
+            textColor: 255,
+            fontStyle: "bold",
+         },
+         alternateRowStyles: {
+            fillColor: [245, 247, 250],
+         },
+      });
+
+      autoTable(doc, {
+         startY: doc.lastAutoTable.finalY + 5,
+         head: [["Weekly Targets", ""]],
+         body: [
+            ["Running", `${targets.weeklyRunKm || "-"} km`],
+            ["Cycling", `${targets.weeklyCycleKm || "-"} km`],
+            ["Calories", targets.dailyCalories || "-"],
+         ],
+         columnStyles: {
+            0: { cellWidth: 80, fontStyle: 'bold' },
+            1: { cellWidth: 100 },
+
+         },
+         theme: "grid",
+         styles: {
+            fontSize: 11,
+            cellPadding: 4,
+         },
+         headStyles: {
+            fillColor: [34, 197, 94],
+            textColor: 255,
+            fontStyle: "bold",
+         },
+         alternateRowStyles: {
+            fillColor: [245, 247, 250],
+         },
+      });
+
+      doc.setFontSize(9);
+      doc.setTextColor(120);
+      doc.setFont('helvetica', 'bold')
+      doc.text(
+         `Exported: ${new Date().toLocaleString()}`,
+         14,
+         doc.lastAutoTable.finalY + 15
+      );
+
+      doc.save(`Athlete_Report_${new Date().toISOString().split("T")[0]}.pdf`);
    };
+   //To see user data in text format 
+   // const handleExportData = () => {
+   //    const { profile, targets } = settings
+   //    const content = `
+   //       ATHLETE PROFILE 
+   //       --------------------------------------------
+
+   //       Name: ${profile.name || '-'}
+   //       Age: ${profile.age || '-'}
+   //       Weight: ${profile.weight || '-'}
+   //       Max Heart Rate: ${profile.maxHR || '-'}
+
+   //       Weekly Targets 
+   //       --------------------------------------------
+
+   //       Running: ${targets.weeklyRunKm || "-"} km
+   //       Cycling: ${targets.weeklyCycleKm || "-"} km
+   //       Calories: ${targets.dailyCalories || "-"}
+
+   //       Exported on: ${new Date().toLocaleString()}
+   //    `;
+
+   //    const blob = new Blob([content], { type: "text/plain" });
+   //    const url = URL.createObjectURL(blob)
+   //    const a = document.createElement('a');
+   //    a.href = url
+   //    a.download = `Athlete_Profile_${new Date().toISOString().split("T")[0]}.pdf`;
+
+   //    document.body.appendChild(a);
+   //    a.click()
+   //    document.body.removeChild(a);
+   // }
 
    const handleImportData = (e) => {
       const file = e.target.files[0];
@@ -155,7 +258,7 @@ const Settings = () => {
             <div className="flex flex-wrap gap-4">
 
                <Button className="bg-blue-500 text-white hover:bg-blue-600 shadow-md" onClick={handleExportData}>
-                  <Download size={18} className="mr-2" /> Export JSON
+                  <Download size={18} className="mr-2" /> Download Report
                </Button>
 
                <label className="cursor-pointer">
