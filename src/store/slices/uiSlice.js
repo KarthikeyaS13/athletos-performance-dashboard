@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   sidebarOpen: true,
-  theme: 'dark',
+  theme: localStorage.getItem('athletos_theme') || 'dark',
   activeToasts: [],
 };
 
@@ -18,6 +18,7 @@ const uiSlice = createSlice({
     },
     setTheme: (state, action) => {
       state.theme = action.payload;
+      localStorage.setItem('athletos_theme', action.payload);
     },
     addToast: (state, action) => {
       // action.payload: { id, type, message }
