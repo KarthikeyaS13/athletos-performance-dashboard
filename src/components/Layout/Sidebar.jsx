@@ -4,7 +4,7 @@ import { toggleSidebar } from '../../store/slices/uiSlice';
 import {
   Zap, LayoutDashboard, PlusCircle, History,
   Utensils, Calendar, Trophy, BarChart2,
-  FileText, Settings, Menu
+  FileText, Settings, Menu, ChevronLeft
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -24,70 +24,90 @@ const Sidebar = () => {
     { name: 'Settings', path: '/settings', icon: <Settings size={20} /> },
   ];
 
-  const handleAction = () => {
-    navigate('/settings')
-  }
-
-  const settings = useSelector(state => state.settings)
-
-  const fullname = settings?.profile?.name || '';
-  const nameParts = fullname.trim().split(" ");
-  const initials = nameParts.length >= 2 ? nameParts[0][0] + nameParts[1][0] : nameParts[0]?.slice(0, 2) || 'AB'
+  const settings = useSelector(state => state.settings);
+  const fullname = settings?.profile?.name || 'Athlete';
+  const initials = fullname.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 
   return (
-    <aside className={`fixed top-0 left-0 h-screen bg-white dark:bg-[#0f172a] border-r border-[#334155] border-gray-200 dark:border-[#1e293b] transition-all duration-300 z-50 flex flex-col ${sidebarOpen ? 'w-64' : 'w-20'}`}>
-      <div className="flex items-center justify-between p-4 border-b border-[#334155]">
-        <div className={`flex items-center space-x-3 overflow-hidden ${!sidebarOpen && 'hidden'}`}>
-          <Zap className="text-accent flex-shrink-0" size={28} />
-          <span className="text-xl font-bold text-gray-600 dark:text-gray-300 font-sans tracking-tight">AthleteOS</span>
+    <aside className={`
+      fixed top-0 left-0 h-screen 
+      bg-white dark:bg-[#0f172a] 
+      border-r border-gray-100 dark:border-gray-800 
+      transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] 
+      z-50 flex flex-col 
+      ${sidebarOpen ? 'w-64' : 'w-20'}
+    `}>
+      {/* Logo Area */}
+      <div className="flex items-center justify-between p-5 h-20">
+        <div className={`flex items-center gap-3 overflow-hidden transition-all duration-500 ${sidebarOpen ? 'opacity-100' : 'opacity-0 scale-50'}`}>
+          <div className="p-2 bg-accent rounded-xl shadow-lg shadow-accent/20">
+            <Zap className="text-white" size={24} />
+          </div>
+          <span className="text-xl font-black text-gray-900 dark:text-white font-display tracking-tighter italic">AthleteOS</span>
         </div>
         <button
           onClick={() => dispatch(toggleSidebar())}
-          className="p-1 rounded-md hover:bg-[#334155] text-gray-400 hover:text-white transition-colors"
+          className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-accent transition-all duration-300"
         >
-          <Menu size={24} />
+          {sidebarOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto py-4 scrollbar-thin scrollbar-thumb-[#334155] scrollbar-track-transparent">
-        <nav className="space-y-1 px-3">
-          {navItems.map(item => (
-            <NavLink
-              key={item.name}
-              to={item.path}
-              className={({ isActive }) =>
-                `flex items-center p-3 rounded-xl transition-all duration-200 group ${isActive
-                  ? 'bg-accent/10 text-accent font-medium'
-                  : 'text-gray-600 dark:text-gray-300 hover:bg-[#334155]/50 hover:text-gray-100'
-                }`
+      {/* Nav Items */}
+      <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1.5 scrollbar-hide">
+        {navItems.map(item => (
+          <NavLink
+            key={item.name}
+            to={item.path}
+            className={({ isActive }) => `
+              flex items-center p-3 rounded-2xl transition-all duration-300 group relative
+              ${isActive
+                ? 'bg-accent/5 text-accent font-bold'
+                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-white'
               }
-              title={!sidebarOpen ? item.name : undefined}
-            >
-              <div className="flex flex-shrink-0 items-center justify-center">
-                {item.icon}
-              </div>
-              {sidebarOpen && (
-                <span className="ml-3 truncate">{item.name}</span>
-              )}
-            </NavLink>
-          ))}
-        </nav>
+            `}
+            title={!sidebarOpen ? item.name : undefined}
+          >
+            {/* Active Indicator Bar */}
+            <div className={`
+              absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-accent rounded-r-full transition-all duration-300
+              ${sidebarOpen ? 'opacity-0 -left-1' : 'opacity-0'}
+              group-[.active]:opacity-100
+            `} />
+            
+            <div className="flex flex-shrink-0 items-center justify-center transition-transform duration-300 group-hover:scale-110">
+              {item.icon}
+            </div>
+            
+            <span className={`
+              ml-3 truncate transition-all duration-500 font-medium
+              ${sidebarOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'}
+            `}>
+              {item.name}
+            </span>
+          </NavLink>
+        ))}
       </div>
 
-      <div className="p-4 border-t border-[#334155]">
-        <div className={`flex items-center ${sidebarOpen ? 'space-x-3' : 'justify-center'}`}>
-          <div onClick={handleAction} className="w-10 h-10 rounded-full bg-gradient-to-tr from-accent to-purple-500 flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-bold text-sm uppercase">{initials}</span>
-
+      {/* Profile Area */}
+      <div className="p-4 border-t border-gray-100 dark:border-gray-800">
+        <div 
+          onClick={() => navigate('/settings')}
+          className={`
+            flex items-center p-2 rounded-2xl cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300 group
+            ${sidebarOpen ? 'gap-3' : 'justify-center'}
+          `}
+        >
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-accent to-blue-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-accent/20 transition-transform group-hover:rotate-6">
+            <span className="text-white font-black text-sm">{initials}</span>
           </div>
 
           {sidebarOpen && (
             <div className="overflow-hidden">
-              <p className="text-lg font-medium dark:text-gray-300 text-gray-600 truncate">{fullname || 'Athlete'}</p>
-              <p className='text-xs text-gray-500 dark:text-gray-300'>{fullname ? 'Athlete' : ''}</p>
-              <div className="flex items-center space-x-1">
-                <span className="w-2 h-2 rounded-full bg-success"></span>
-                <span className="text-xs text-gray-600 dark:text-gray-300 truncate">Optimal Load</span>
+              <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{fullname}</p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Optimal Load</span>
               </div>
             </div>
           )}
